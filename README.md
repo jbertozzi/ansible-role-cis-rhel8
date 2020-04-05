@@ -1,7 +1,7 @@
 # cis-rhel8
 
 
-[![Build Status](https://travis-ci.com/jbertozzi/cis-rhel8.svg?branch=master)](https://travis-ci.com/jbertozzi/cis-rhel8)
+[![Build Status](https://travis-ci.com/jbertozzi/ansible-role-cis-rhel8.svg?branch=master)](https://travis-ci.com/jbertozzi/ansible-role-cis-rhel8)
 
 Configure a RHEL 8 server to conform [CIS Benchmarks](https://www.cisecurity.org/benchmark/red_hat_linux/).
 
