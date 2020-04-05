@@ -1,0 +1,361 @@
+---
+# defaults file for cis-rhel8
+
+# section 1: Initial  Setup
+cis_rhel8_section1: true
+cis_rhel8_1_1_1_1: true
+cis_rhel8_1_1_1_2: true
+cis_rhel8_1_1_1_3: true
+cis_rhel8_1_1_1_4: true
+cis_rhel8_1_1_2: true
+cis_rhel8_1_1_3: true
+cis_rhel8_1_1_4: true
+cis_rhel8_1_1_5: true
+cis_rhel8_1_1_6: true
+cis_rhel8_1_1_7: true
+cis_rhel8_1_1_8: true
+cis_rhel8_1_1_9: true
+cis_rhel8_1_1_10: true
+cis_rhel8_1_1_11: true
+cis_rhel8_1_1_12: true
+cis_rhel8_1_1_13: true
+cis_rhel8_1_1_14: true
+cis_rhel8_1_1_15: true
+cis_rhel8_1_1_16: true
+cis_rhel8_1_1_17: true
+cis_rhel8_1_1_18: true
+cis_rhel8_1_1_19: true
+cis_rhel8_1_1_20: true
+cis_rhel8_1_1_21: true
+cis_rhel8_1_1_22: true
+cis_rhel8_1_1_23: true
+cis_rhel8_1_2_1: true
+cis_rhel8_1_2_2: true
+cis_rhel8_1_2_3: true
+cis_rhel8_1_2_4: true
+cis_rhel8_1_2_5: true
+cis_rhel8_1_3_1: true
+cis_rhel8_1_3_2: true
+cis_rhel8_1_3_3: true
+cis_rhel8_1_4_1: true
+cis_rhel8_1_4_2: true
+cis_rhel8_1_5_1: true
+cis_rhel8_1_5_2: true
+cis_rhel8_1_5_3: true
+cis_rhel8_1_6_1: true
+cis_rhel8_1_6_2: true
+cis_rhel8_1_7_1_1: true
+cis_rhel8_1_7_1_2: true
+cis_rhel8_1_7_1_3: true
+cis_rhel8_1_7_1_4: true
+cis_rhel8_1_7_1_5: true
+cis_rhel8_1_7_1_6: true
+cis_rhel8_1_7_1_7: true
+cis_rhel8_1_8_1_1: true
+cis_rhel8_1_8_1_2: true
+cis_rhel8_1_8_1_3: true
+cis_rhel8_1_8_1_4: true
+cis_rhel8_1_8_1_5: true
+cis_rhel8_1_8_1_6: true
+cis_rhel8_1_8_2: true
+cis_rhel8_1_9: true
+cis_rhel8_1_10: true
+cis_rhel8_1_11: true
+
+# 1.1.2
+cis_rhel8_tmp_size: 1G
+# 1.1.3
+cis_rhel8_iologfiles: /var/log/sudo.log
+#.1.15
+cis_rhel8_shm_size: 65536k
+# 1.4.2
+cis_rhel8_aide_cron:
+  weekday: "*"
+  minute: 0
+  hour: 3
+  user: root
+  job: /usr/sbin/aide --check
+  cron_file: /etc/cron.d/cis
+# 1.5.2
+cis_rhel8_grub_password: secure
+cis_rhel8_reset_grub_password: false
+# 1.7.1.3
+cis_rhel8_selinux_policy: targeted
+# 1.7.1.4
+cis_rhel8_selinux_state: enforcing
+# 1.8.1.1
+cis_rhel8_motd: ""
+
+# 1.8.1.2, 1.8.1.3
+cis_rhel8_warning_banner: |
+  ------------------------------------------------------------------------------
+  * WARNING                                                                    *
+  * You are accessing a secured system and your actions will be logged along   *
+  * with identifying information. Disconnect immediately if you are not an     *
+  * authorized user of this system.                                            *
+  ------------------------------------------------------------------------------
+# 1.10, 1.11
+cis_rhel8_crypto_policy: FUTURE
+
+# section 2: Services
+cis_rhel8_section2: true
+cis_rhel8_2_1_1: true
+cis_rhel8_2_2_1_1: true
+cis_rhel8_2_2_1_2: true
+cis_rhel8_2_2_2: true
+cis_rhel8_2_2_3: true
+cis_rhel8_2_2_4: true
+cis_rhel8_2_2_5: true
+cis_rhel8_2_2_6: true
+cis_rhel8_2_2_7: true
+cis_rhel8_2_2_8: true
+cis_rhel8_2_2_9: true
+cis_rhel8_2_2_10: true
+cis_rhel8_2_2_11: true
+cis_rhel8_2_2_12: true
+cis_rhel8_2_2_13: true
+cis_rhel8_2_2_14: true
+cis_rhel8_2_2_15: true
+cis_rhel8_2_2_16: true
+cis_rhel8_2_2_17: true
+cis_rhel8_2_2_18: true
+cis_rhel8_2_3_1: true
+cis_rhel8_2_3_2: true
+cis_rhel8_2_3_3: true
+
+# 2.2.1.2
+cis_rhel8_chrony_servers:
+  - 0.fr.pool.ntp.org
+  - 1.fr.pool.ntp.org
+
+# 2.2.2
+
+# section 3: Network configuration
+cis_rhel8_section3: true
+cis_rhel8_3_1_1: true
+cis_rhel8_3_1_2: true
+cis_rhel8_3_2_1: true
+cis_rhel8_3_2_2: true
+cis_rhel8_3_2_3: true
+cis_rhel8_3_2_4: true
+cis_rhel8_3_2_5: true
+cis_rhel8_3_2_6: true
+cis_rhel8_3_2_7: true
+cis_rhel8_3_2_8: true
+cis_rhel8_3_2_9: true
+cis_rhel8_3_3_1: true
+cis_rhel8_3_3_2: true
+cis_rhel8_3_3_3: true
+cis_rhel8_3_3_4: true
+cis_rhel8_3_4_2_1: true
+cis_rhel8_3_4_2_2: true
+cis_rhel8_3_4_2_3: true
+cis_rhel8_3_4_2_4: true
+cis_rhel8_3_4_2_5: true
+cis_rhel8_3_4_2_6: true
+cis_rhel8_3_4_3_1: true
+cis_rhel8_3_4_3_2: true
+cis_rhel8_3_4_3_3: true
+cis_rhel8_3_4_3_4: true
+cis_rhel8_3_4_3_5: true
+cis_rhel8_3_4_3_6: true
+cis_rhel8_3_4_3_7: true
+cis_rhel8_3_4_3_8: true
+cis_rhel8_3_4_4_1_1: true
+cis_rhel8_3_4_4_1_2: true
+cis_rhel8_3_4_4_1_3: true
+cis_rhel8_3_4_4_2_1: true
+cis_rhel8_3_4_4_2_2: true
+cis_rhel8_3_4_4_2_3: true
+cis_rhel8_3_5: true
+cis_rhel8_3_6: true
+
+# 3.4.1
+cis_rhel8_firewall_package: firewalld # firewalld | nftables | iftables
+# 3.4.2.4
+cis_rhel8_firewall_default_zone: public
+
+# section 4: Logging and Auditing
+cis_rhel8_section4: true
+cis_rhel8_4_1_1_1: true
+cis_rhel8_4_1_1_2: true
+cis_rhel8_4_1_1_3: true
+cis_rhel8_4_1_1_4: true
+cis_rhel8_4_1_2_1: true
+cis_rhel8_4_1_2_2: true
+cis_rhel8_4_1_2_3: true
+cis_rhel8_4_1_3: true
+cis_rhel8_4_1_4: true
+cis_rhel8_4_1_5: true
+cis_rhel8_4_1_6: true
+cis_rhel8_4_1_7: true
+cis_rhel8_4_1_8: true
+cis_rhel8_4_1_9: true
+cis_rhel8_4_1_10: true
+cis_rhel8_4_1_11: true
+cis_rhel8_4_1_12: true
+cis_rhel8_4_1_13: true
+cis_rhel8_4_1_14: true
+cis_rhel8_4_1_15: true
+cis_rhel8_4_1_16: true
+cis_rhel8_4_1_17: true
+cis_rhel8_4_2_1_1: true
+cis_rhel8_4_2_1_2: true
+cis_rhel8_4_2_1_3: true
+cis_rhel8_4_2_1_4: true
+cis_rhel8_4_2_1_5: true
+cis_rhel8_4_2_1_6: true
+cis_rhel8_4_2_2_1: true
+cis_rhel8_4_2_2_2: true
+cis_rhel8_4_2_2_3: true
+cis_rhel8_4_2_3: true
+cis_rhel8_4_3: true
+# 4.1.1.4
+cis_rhel8_audit_backlog_limit: 8192
+cis_rhel8_audit_max_log_file: 8
+# 4.2.1.3
+cis_rhel8_rsyslog_file_mode: "0640"
+# 4.2.1.5
+cis_rhel8_rsyslog_server: ""
+
+# section 5: Access, Authentication and Authorization
+cis_rhel8_section5: true
+cis_rhel8_5_1_1: true
+cis_rhel8_5_1_2: true
+cis_rhel8_5_1_3: true
+cis_rhel8_5_1_4: true
+cis_rhel8_5_1_5: true
+cis_rhel8_5_1_6: true
+cis_rhel8_5_1_7: true
+cis_rhel8_5_1_8: true
+cis_rhel8_5_2_1: true
+cis_rhel8_5_2_2: true
+cis_rhel8_5_2_3: true
+cis_rhel8_5_2_4: true
+cis_rhel8_5_2_5: true
+cis_rhel8_5_2_6: true
+cis_rhel8_5_2_7: true
+cis_rhel8_5_2_8: true
+cis_rhel8_5_2_9: true
+cis_rhel8_5_2_10: true
+cis_rhel8_5_2_11: true
+cis_rhel8_5_2_12: true
+cis_rhel8_5_2_13: true
+cis_rhel8_5_2_14: true
+cis_rhel8_5_2_15: true
+cis_rhel8_5_2_16: true
+cis_rhel8_5_2_17: true
+cis_rhel8_5_2_18: true
+cis_rhel8_5_2_19: true
+cis_rhel8_5_2_20: true
+cis_rhel8_5_3_1: true
+cis_rhel8_5_3_2: true
+cis_rhel8_5_3_3: true
+cis_rhel8_5_4_1: true
+cis_rhel8_5_4_2: true
+cis_rhel8_5_4_3: true
+cis_rhel8_5_4_4: true
+cis_rhel8_5_5_1_1: true
+cis_rhel8_5_5_1_2: true
+cis_rhel8_5_5_1_3: true
+cis_rhel8_5_5_1_4: true
+cis_rhel8_5_5_1_5: true
+cis_rhel8_5_5_2: true
+cis_rhel8_5_5_3: true
+cis_rhel8_5_5_4: true
+cis_rhel8_5_5_5: true
+cis_rhel8_5_6: true
+cis_rhel8_5_7: true
+
+# 5.2.2
+#cis_rhel8_sshd:
+#  allowusers:
+#  allowgroups:
+#  denyusers:
+#  denygroups:
+# 5.2.5
+cis_rhel8_sshd_log_level: INFO
+# 5.2.7
+cis_rhel8_sshd_max_auth_tries: 4
+# 5.2.13
+cis_rhel8_sshd_client_alive_interval: 300
+cis_rhel8_sshd_client_alive_count_max: 0
+# 5.2.14
+cis_rhel8_sshd_login_grace_time: 60
+# 5.2.18
+cis_rhel8_sshd_max_startups: "10:30:60"
+# 5.2.19
+cis_rhel8_sshd_max_sessions: 4
+# 5.3.1
+cis_rhel8_authselect_profile: cis-profile
+# 5.4.1
+cis_rhel8_pwquality:
+  minlen: 14
+  dcredit: -1
+  ucredit: -1
+  ocredit: -1
+  lcredit: -1
+  #minclass: 4
+# 5.4.2
+cis_rhel8_pam_failllock_deny: 3
+cis_rhel8_pam_failllock_timeout: 1200
+# 5.4.3
+cis_rhel8_password_reuse: 5
+# 5.5.1.1
+cis_rhel8_pass_max_days: 365
+# 5.5.1.2
+cis_rhel8_pass_min_days: 7
+# 5.5.1.3
+cis_rhel8_pass_warn_age: 7
+# 5.5.1.4
+cis_rhel8_useradd_inactive: 30
+# 5.5.2
+cis_rhel8_min_uid: 1000
+# 5.5.3
+cis_rhel8_shell_timeout: 900
+# 5.5.5
+cis_rhel8_umask: "027"
+
+# section 6: System Maintenance
+cis_rhel8_section6: true
+cis_rhel8_6_1_1: true
+cis_rhel8_6_1_2: true
+cis_rhel8_6_1_3: true
+cis_rhel8_6_1_4: true
+cis_rhel8_6_1_5: true
+cis_rhel8_6_1_6: true
+cis_rhel8_6_1_7: true
+cis_rhel8_6_1_8: true
+cis_rhel8_6_1_9: true
+cis_rhel8_6_1_10: true
+cis_rhel8_6_1_11: true
+cis_rhel8_6_1_12: true
+cis_rhel8_6_1_13: true
+cis_rhel8_6_1_14: true
+cis_rhel8_6_2_1: true
+cis_rhel8_6_2_2: true
+cis_rhel8_6_2_3: true
+cis_rhel8_6_2_4: true
+cis_rhel8_6_2_5: true
+cis_rhel8_6_2_6: true
+cis_rhel8_6_2_7: true
+cis_rhel8_6_2_8: true
+cis_rhel8_6_2_9: true
+cis_rhel8_6_2_10: true
+cis_rhel8_6_2_11: true
+cis_rhel8_6_2_12: true
+cis_rhel8_6_2_13: true
+cis_rhel8_6_2_14: true
+cis_rhel8_6_2_15: true
+cis_rhel8_6_2_16: true
+cis_rhel8_6_2_17: true
+cis_rhel8_6_2_18: true
+cis_rhel8_6_2_19: true
+cis_rhel8_6_2_20: true
+
+# 6.1.1
+cis_rhel8_audit_rpms_permissions_output: /var/tmp/audit_rpms.log
+# 6.1.11
+cis_rhel8_user_unowned_file: nobody
+# 6.1.12
+cis_rhel8_group_ungrouped_file: nobody

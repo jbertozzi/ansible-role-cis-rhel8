@@ -1,0 +1,483 @@
+---
+- name: 6.1.1 Audit system file permissions (Not Scored)
+  cron:
+    name: CIS 6.1.1 Audit system file permissions
+    weekday: "*"
+    minute: "0"
+    hour: "3"
+    user: root
+    job: "rpm -Va --nomtime --nosize --nomd5 --nolinkto > {{ cis_rhel8_audit_rpms_permissions_output }}"
+  when:
+    - cis_rhel8_6_1_1
+  tags:
+    - notscored
+    - level2
+    - section6
+
+- name: 6.1.2 Ensure permissions on /etc/passwd are configured (Scored)
+  file:
+    dest: /etc/passwd
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - cis_rhel8_6_1_2
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.1.3 Ensure permissions on /etc/shadow are configured (Scored)
+  file:
+    dest: /etc/shadow
+    owner: root
+    group: root
+    mode: 0640
+  when:
+    - cis_rhel8_6_1_3
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.1.4 Ensure permissions on /etc/group are configured (Scored)
+  file:
+    dest: /etc/group
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - cis_rhel8_6_1_4
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.1.5 Ensure permissions on /etc/gshadow are configured (Scored)
+  file:
+    dest: /etc/gshadow
+    owner: root
+    group: root
+    mode: 0640
+  when:
+    - cis_rhel8_6_1_5
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.1.6 Ensure permissions on /etc/passwd- are configured (Scored)
+  file:
+    dest: /etc/passwd-
+    owner: root
+    group: root
+    mode: 0600
+  when:
+    - cis_rhel8_6_1_6
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.1.7 Ensure permissions on /etc/shadow- are configured (Scored)
+  file:
+    dest: /etc/shadow-
+    owner: root
+    group: root
+    mode: 0600
+  when:
+    - cis_rhel8_6_1_7
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.1.8 Ensure permissions on /etc/group- are configured (Scored)
+  file:
+    dest: /etc/group-
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - cis_rhel8_6_1_8
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.1.9 Ensure permissions on /etc/gshadow- are configured (Scored)
+  file:
+    dest: /etc/gshadow-
+    owner: root
+    group: root
+    mode: 0640
+  when:
+    - cis_rhel8_6_1_9
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.1.10 Ensure no world writable files exist (Scored)
+  block:
+    - name: 6.1.10 Ensure no world writable files exist (Scored) - find files
+      shell: |
+        set -o pipefail
+        df --local -P | awk '{if (NR!=1) print $6}' | xargs -I '{}' find '{}' -xdev -type f -perm -0002
+      args:
+        executable: /bin/bash
+      register: world_writable_files
+      changed_when: false
+      failed_when: false
+
+    - name: 6.1.10 Ensure no world writable files exist (Scored) - fix permission
+      command: "chmod o-x '{{ item }}'"
+      args:
+        warn: false
+      when:
+        - world_writable_files.stdout_lines | length > 0
+      with_items:
+        - "{{ world_writable_files.stdout_lines }}"
+  when:
+    - cis_rhel8_6_1_10
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.1.11 Ensure no unowned files or directories exist (Scored)
+  block:
+    - name: 6.1.11 Ensure no unowned files or directories exist (Scored) - find files
+      shell: |
+        set -o pipefail
+        df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nouser
+      args:
+        executable: /bin/bash
+      changed_when: false
+      failed_when: false
+      register: unowned_files
+
+    - name: 6.1.11 Ensure no unowned files or directories exist (Scored) - fix permission
+      file:
+        path: "{{ item }}"
+        owner: "{{ cis_rhel8_user_unowned_file }}"
+      when:
+        - unowned_files.stdout_lines | length > 0
+      with_items: "{{ unowned_files.stdout_lines }}"
+  when:
+    - cis_rhel8_6_1_11
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.1.12 Ensure no ungrouped files or directories exist (Scored)
+  block:
+    - name: 6.1.12 Ensure no ungrouped files or directories exist (Scored) - find files
+      shell: |
+        set -o pipefail
+        df --local -P | awk {'if (NR!=1) print $6'} | xargs -I '{}' find '{}' -xdev -nogroup
+      args:
+        executable: /bin/bash
+      changed_when: false
+      failed_when: false
+      register: ungrouped_files
+
+    - name: 6.1.12 Ensure no ungrouped files or directories exist (Scored) - fix permission
+      file:
+        path: "{{ item }}"
+        group: "{{ cis_rhel8_group_ungrouped_file }}"
+      with_items: "{{ ungrouped_files.stdout_lines }}"
+      when:
+        - ungrouped_files.stdout_lines | length > 0
+  when:
+    - cis_rhel8_6_1_12
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.1.13 Audit SUID executables (Not Scored)
+  shell: |
+    set -o pipefail
+    df --local -P | awk '{if (NR!=1) print $6}' | xargs -I '{}' find '{}' -xdev -type f -perm -4000
+  args:
+    executable: /bin/bash
+  when:
+    - cis_rhel8_6_1_13
+  changed_when: false
+  failed_when: false
+  register: suid_files
+  tags:
+    - notscored
+    - level1
+    - section6
+
+- name: 6.1.14 Audit SGID executables (Not Scored)
+  shell: |
+    set -o pipefail
+    df --local -P | awk '{if (NR!=1) print $6}' | xargs -I '{}' find '{}' -xdev -type f -perm -2000
+  args:
+    executable: /bin/bash
+  when:
+    - cis_rhel8_6_1_14
+  changed_when: false
+  failed_when: false
+  register: sgid_files
+  tags:
+    - notscored
+    - level1
+    - section6
+
+- name: 6.2.1 Ensure password fields are not empty (Scored) - find users
+  shell: |
+    set -o pipefail
+    getent shadow | grep -Po '^[^:]*(?=::)'
+  register: users_without_password
+  failed_when: false
+  changed_when: false
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.2.1 Ensure password fields are not empty (Scored) - lock password
+  user:
+    name: "{{ item }}"
+    password_lock: true
+  with_items: "{{ users_without_password.stdout_lines }}"
+  when:
+    - cis_rhel8_6_2_1
+    - users_without_password.stdout_lines | length > 0
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.2.2 Ensure no legacy "+" entries exist in /etc/passwd (Scored)
+  lineinfile:
+    dest: /etc/passwd
+    regexp: '^\+.*'
+    state: absent
+  when:
+    - cis_rhel8_6_2_2
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.2.3 Ensure root PATH Integrity (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_3
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplmented
+
+- name: 6.2.4 Ensure no legacy "+" entries exist in /etc/shadow (Scored)
+  lineinfile:
+    dest: /etc/shadow
+    regexp: '^\+.*'
+    state: absent
+  when:
+    - cis_rhel8_6_2_4
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.2.5 Ensure no legacy "+" entries exist in /etc/group (Scored)
+  lineinfile:
+    dest: /etc/group
+    regexp: '^\+.*'
+    state: absent
+  when:
+    - cis_rhel8_6_2_5
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.2.6 Ensure root is the only UID 0 account (Scored)
+  block:
+    - name: 6.2.6 Ensure root is the only UID 0 account (Scored) - find users
+      shell: |
+        set -o pipefail
+        awk -F':' '($3 == 0) { print $1 }' /etc/passwd
+      register: users_uid_zero
+      changed_when: false
+      failed_when: false
+
+    - name: 6.2.6 Ensure root is the only UID 0 account (Scored) - lock users
+      user:
+        name: "{{ item }}"
+        password_lock: true
+      with_items: "{{ users_uid_zero.stdout_lines }}"
+      when:
+        - item != 'root'
+  when:
+    - cis_rhel8_6_2_6
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.2.7 Ensure users' home directories permissions are 750 or more restrictive (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_7
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplemented
+
+- name: 6.2.8 Ensure users own their home directories (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_8
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplemented
+
+- name: 6.2.9 Ensure users' dot files are not group or world writable (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_9
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplemented
+
+- name: 6.2.10 Ensure no users have .forward files (Scored)
+  file:
+    state: absent
+    dest: "~{{ item }}/.forward"
+  with_items: "{{ users }}"
+  when:
+    - cis_rhel8_6_2_10
+  tags:
+    - level1
+    - scored
+    - section6
+
+- name: 6.2.11 Ensure no users have .netrc files (Scored)
+  file:
+    state: absent
+    dest: "~{{ item }}/.netrc"
+  with_items: "{{ users }}"
+  when:
+    - cis_rhel8_6_2_11
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.2.12 Ensure users' .netrc Files are not group or world accessible (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_12
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplemented
+
+- name: 6.2.13 Ensure no users have .rhosts files (Scored)
+  file:
+    state: absent
+    dest: "~{{ item }}/.rhosts"
+  with_items: "{{ users }}"
+  when:
+    - cis_rhel8_6_2_13
+  tags:
+    - scored
+    - level1
+    - section6
+
+- name: 6.2.14 Ensure all groups in /etc/passwd exist in /etc/group (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_14
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplemented
+
+- name: 6.2.15 Ensure no duplicate UIDs exist (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_15
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplmented
+
+- name: 6.2.16 Ensure no duplicate GIDs exist (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_16
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplmented
+
+- name: 6.2.17 Ensure no duplicate user names exist (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_17
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplmented
+
+- name: 6.2.18 Ensure no duplicate group names exist (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_18
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplmented
+
+- name: 6.2.19 Ensure shadow group is empty (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_19
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplmented
+
+- name: 6.2.20 Ensure all users' home directories exist (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_6_2_20
+  tags:
+    - scored
+    - level1
+    - section6
+    - notimplmented

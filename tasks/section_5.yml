@@ -1,0 +1,755 @@
+---
+- name: 5.1.1 Ensure cron daemon is enabled (Scored)
+  service:
+    name: crond
+    state: started
+    enabled: true
+  when:
+    - cis_rhel8_5_1_1
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.1.2 Ensure permissions on /etc/crontab are configured (Scored)
+  file:
+    dest: /etc/crontab
+    owner: root
+    group: root
+    mode: 0600
+  when:
+    - cis_rhel8_5_1_2
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.1.3 Ensure permissions on /etc/cron.hourly are configured (Scored)
+  file:
+    dest: /etc/cron.hourly
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+  when:
+    - cis_rhel8_5_1_3
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.1.4 Ensure permissions on /etc/cron.daily are configured (Scored)
+  file:
+    dest: /etc/cron.daily
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+  when:
+    - cis_rhel8_5_1_4
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.1.5 Ensure permissions on /etc/cron.weekly are configured (Scored)
+  file:
+    dest: /etc/cron.weekly
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+  when:
+    - cis_rhel8_5_1_5
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.1.6 Ensure permissions on /etc/cron.monthly are configured (Scored)
+  file:
+    dest: /etc/cron.monthly
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+  when:
+    - cis_rhel8_5_1_6
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.1.7 Ensure permissions on /etc/cron.d are configured (Scored)
+  file:
+    dest: /etc/cron.d
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+  when:
+    - cis_rhel8_5_1_7
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.1.8 Ensure at/cron is restricted to authorized users (Scored)
+  file:
+    dest: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/cron.deny
+    - /etc/cron.allow
+  when:
+    - cis_rhel8_5_1_8
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.2.1 Ensure permissions on /etc/ssh/sshd_config are configured (Scored)
+  file:
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    state: file
+    mode: 0600
+  when:
+    - cis_rhel8_5_2_1
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.2.2 Ensure SSH access is limited (Scored)
+  block:
+    - name: 5.2.2 Ensure SSH access is limited (Scored) - allowusers
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: '(?i)^AllowUsers'
+        line: AllowUsers {{ cis_rhel8_sshd['allowusers'] }}
+      notify:
+        - restart sshd
+      when:
+        - cis_rhel8_sshd['allowusers'] |default('')
+
+    - name: 5.2.2 Ensure SSH access is limited (Scored) - allowgroups
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: '(?i)^AllowGroups'
+        line: AllowGroups {{ cis_rhel8_sshd['allowgroups'] }}
+      notify:
+        - restart sshd
+      when:
+        - cis_rhel8_sshd['allowgoups'] |default('')
+
+    - name: 5.2.2 Ensure SSH access is limited (Scored) - denyusers
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: '(?i)^DenyUsers'
+        line: DenyUsers {{ cis_rhel8_sshd['denyusers'] }}
+      notify:
+        - restart sshd
+      when:
+        - cis_rhel8_sshd['denyusers'] |default('')
+
+    - name: 5.2.2 Ensure SSH access is limited (Scored) - denygroups
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: '(?i)^DenyGroups'
+        line: DenyGroups {{ cis_rhel8_sshd['denygroups'] }}
+      notify:
+        - restart sshd
+      when:
+        - cis_rhel8_sshd['denygroups'] | default('')
+  when:
+    - cis_rhel8_5_2_2
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.2.3 Ensure permissions on SSH private host key files are configured (Scored)
+  block:
+    - name: 5.2.3 Ensure permissions on SSH private host key files are configured (Scored) - search file
+      command: find /etc/ssh -xdev -type f -name 'ssh_host_*_key'
+      register: host_key_files
+      changed_when: false
+      failed_when: false
+
+    - name: 5.2.3 Ensure permissions on SSH private host key files are configured (Scored) - fix permission
+      file:
+        dest: "{{ item }}"
+        owner: root
+        group: root
+        mode: 0600
+      with_items: "{{ host_key_files.stdout_lines }}"
+  when:
+    - cis_rhel8_5_2_3
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.2.4 Ensure permissions on SSH public host key files are configured (Scored)
+  block:
+    - name: 5.2.4 Ensure permissions on SSH public host key files are configured (Scored) - search file
+      command: find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub'
+      register: host_pub_files
+      changed_when: false
+      failed_when: false
+
+    - name: 5.2.4 Ensure permissions on SSH public host key files are configured (Scored) - fix permission
+      file:
+        dest: "{{ item }}"
+        owner: root
+        group: root
+        mode: 0600
+      with_items: "{{ host_pub_files.stdout_lines }}"
+  when:
+    - cis_rhel8_5_2_4
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.2.5 Ensure SSH LogLevel is appropriate (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.5"
+    block: |
+      LogLevel {{ cis_rhel8_sshd_log_level }}
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_5
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.6 Ensure SSH X11 forwarding is disabled (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.6"
+    block: |
+      X11Forwarding no
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_6
+  tags:
+    - scored
+    - level2
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.7 Ensure SSH MaxAuthTries is set to 4 or less (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.7"
+    block: |
+      MaxAuthTries {{ cis_rhel8_sshd_max_auth_tries }}
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_7
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.8 Ensure SSH IgnoreRhosts is enabled (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.8"
+    block: |
+      IgnoreRhosts yes
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_8
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.9 Ensure SSH HostbasedAuthentication is disabled (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.9"
+    block: |
+      HostbasedAuthentication no
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_9
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.10 Ensure SSH root login is disabled (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.10"
+    block: |
+      PermitRootLogin no
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_10
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.11 Ensure SSH PermitEmptyPasswords is disabled (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.11"
+    block: |
+      PermitEmptyPasswords no
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_11
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.12 Ensure SSH PermitUserEnvironment is disabled (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.12"
+    block: |
+      PermitUserEnvironment no
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_12
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.13 Ensure SSH Idle Timeout Interval is configured (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.13"
+    block: |
+      ClientAliveInterval {{ cis_rhel8_sshd_client_alive_interval }}
+      ClientAliveCountMax {{ cis_rhel8_sshd_client_alive_count_max }}
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_13
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.14 Ensure SSH LoginGraceTime is set to one minute or less (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.14"
+    block: |
+      LoginGraceTime {{ cis_rhel8_sshd_login_grace_time }}
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_14
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.15 Ensure SSH warning banner is configured (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.15"
+    block: |
+      Banner /etc/issue.net
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_15
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.16 Ensure SSH PAM is enabled (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.16"
+    block: |
+      UsePAM yes
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_16
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.17 Ensure SSH AllowTcpForwarding is disabled (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.17"
+    block: |
+      AllowTcpForwarding no
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_17
+  tags:
+    - scored
+    - level2
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.18 Ensure SSH MaxStartups is configured (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.18"
+    block: |
+      MaxStartups {{ cis_rhel8_sshd_max_startups }}
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_18
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.19 Ensure SSH MaxSessions is set to 4 or less (Scored)
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "# {mark} cis-rhel8 5.2.19"
+    block: |
+      MaxSessions {{ cis_rhel8_sshd_max_sessions }}
+    validate: /usr/sbin/sshd -T -f %s
+  when:
+    - cis_rhel8_5_2_19
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.2.20 Ensure system-wide crypto policy is not over-ridden (Scored)
+  lineinfile:
+    dest: /etc/sysconfig/sshd
+    regexp: "^\\s*CRYPTO_POLICY\\s*=\\s*.*$"
+    state: absent
+  tags:
+    - scored
+    - level1
+    - section5
+  notify:
+    - restart sshd
+
+- name: 5.3.1 Create custom authselect profile (Scored)
+  block:
+    - name: 5.3.1 Create custom authselect profile (Scored) - search profile
+      shell: authselect list | grep custom/{{ cis_rhel8_authselect_profile }}
+      register: authselect_list_profiles
+      changed_when: false
+      failed_when: false
+
+    - name: 5.3.1 Create custom authselect profile (Scored) - create profile
+      command: authselect create-profile {{ cis_rhel8_authselect_profile }} -b sssd --symlink-meta
+      when:
+        - authselect_list_profiles.rc != 0
+  when:
+    - cis_rhel8_5_3_1
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: "5.3.2 Select authselect profile (Scored) - select profile\n
+  5.3.3 Ensure authselect includes with-faillock (Scored)"
+  block:
+    - name: 5.3.2 Select authselect profile (Scored) - find current profile
+      shell: "authselect current | grep \"Profile ID\" | sed 's@Profile ID: @@'"
+      register: authselect_current_profile
+      changed_when: false
+      failed_when: false
+
+    - name: "5.3.2 Select authselect profile (Scored) - select profile\n
+      5.3.3 Ensure authselect includes with-faillock (Scored)"
+      command: authselect select custom/{{ cis_rhel8_authselect_profile }} {{ cis_rhel8_5_3_3 | ternary("with-faillock", "") }} --force
+      when:
+        - authselect_current_profile.rc == 0
+        - authselect_current_profile.stdout != "/".join(["custom", cis_rhel8_authselect_profile])
+  when:
+    - cis_rhel8_5_3_2
+    - cis_rhel8_5_3_3
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.4.1 Ensure password creation requirements are configured (Scored)
+  # TODO: deal with authselect
+  lineinfile:
+    regexp: "\\s*{{ item.key }}\\s*=\\s*.*"
+    line: "{{ item.key }} = {{ item.value }}"
+    dest: /etc/security/pwquality.conf
+  with_dict: "{{ cis_rhel8_pwquality }}"
+  when:
+    - cis_rhel8_5_4_1
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.4.2 Ensure lockout for failed password attempts is configured (Scored) - unlock_time
+  replace:
+    path: /etc/authselect/custom/{{ cis_rhel8_authselect_profile }}/{{ item }}
+    regexp: '^(\s*auth\s+required\s+pam_faillock.so\s+.*unlock_time=)\S+(\s*.*)$'
+    replace: '\g<1>{{ cis_rhel8_pam_failllock_timeout }}\g<2>'
+  when:
+    - cis_rhel8_5_3_2
+    - cis_rhel8_5_3_3
+    - cis_rhel8_5_4_2
+  with_items:
+    - password-auth
+    - system-auth
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.4.2 Ensure lockout for failed password attempts is configured (Scored) - deny
+  replace:
+    path: /etc/authselect/custom/{{ cis_rhel8_authselect_profile }}/password-auth
+    regexp: '^(\s*auth\s+required\s+pam_faillock.so\s+.*deny=)\S+(\s*.*)$'
+    replace: '\g<1>{{ cis_rhel8_pam_failllock_deny }}\g<2>'
+  when:
+    - cis_rhel8_5_4_2
+  with_items:
+    - password-auth
+    - system-auth
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.4.3 Ensure password reuse is limited (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_5_4_3
+  with_items:
+    - password-auth
+    - system-auth
+  tags:
+    - scored
+    - level1
+    - section5
+    - notimplemented
+
+- name: 5.4.4 Ensure password hashing algorithm is SHA-512 (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_5_4_4
+  tags:
+    - level1
+    - scored
+    - section5
+    - notimplemented
+
+- name: 5.5.1.1 Ensure password expiration is 365 days or less (Scored)
+  lineinfile:
+    dest: /etc/login.defs
+    regexp: "^\\s*PASS_MAX_DAYS\\s*.*$"
+    line: 'PASS_MAX_DAYS {{ cis_rhel8_pass_max_days }}'
+    state: present
+  when:
+    - cis_rhel8_5_5_1_1
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.5.1.2 Ensure minimum days between password changes is 7 or more (Scored)
+  lineinfile:
+    dest: /etc/login.defs
+    regexp: "^\\s*PASS_MIN_DAYS\\s*.*$"
+    line: 'PASS_MIN_DAYS {{ cis_rhel8_pass_min_days }}'
+    state: present
+  when:
+    - cis_rhel8_5_5_1_2
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.5.1.3 Ensure password expiration warning days is 7 or more (Scored)
+  lineinfile:
+    dest: /etc/login.defs
+    regexp: "^\\s*PASS_WARN_AGE\\s*.*$"
+    line: 'PASS_WARN_AGE {{ cis_rhel8_pass_warn_age }}'
+    state: present
+  when:
+    - cis_rhel8_5_5_1_3
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.5.1.4 Ensure inactive password lock is 30 days or less (Scored)
+  lineinfile:
+    dest: /etc/default/useradd
+    regexp: "^\\s*INACTIVE\\s*=\\s*.*$"
+    line: 'INACTIVE={{ cis_rhel8_useradd_inactive }}'
+    state: present
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.5.1.5 Ensure all users last password change date is in the past (Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_5_5_1_5
+  tags:
+    - scored
+    - level1
+    - section5
+    - notimplemented
+
+- name: 5.5.2 Ensure system accounts are secured (Scored)
+  block:
+    - name: 5.5.2 Ensure system accounts are secured (Scored) - find users
+      shell: "awk -F: '($3 < {{ cis_rhel8_min_uid }}) {print $1 }' /etc/passwd"
+      changed_when: false
+      check_mode: false
+      register: system_account
+
+    - name: 5.5.2 Ensure system accounts are secured (Scored) - lock users
+      user:
+        name: "{{ item }}"
+        password_lock: true
+      with_items:
+        - "{{ system_account.stdout_lines }}"
+      when:
+        - item != "root"
+
+    - name: 5.5.2 Ensure system accounts are secured (Scored) - set shell to nologin
+      user:
+        name: "{{ item }}"
+        shell: /sbin/nologin
+      with_items:
+        - "{{ system_account.stdout_lines }}"
+      when:
+        - item != "root"
+        - item != "sync"
+        - item != "shutdown"
+        - item != "halt"
+  when:
+    - cis_rhel8_5_5_2
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.5.3 Ensure default user shell timeout is 900 seconds or less (Scored)
+  lineinfile:
+    state: present
+    dest: "{{ item }}"
+    create: true
+    regexp: '^TMOUT='
+    line: "readonly TMOUT={{ cis_rhel8_shell_timeout }} ; export TMOUT"
+  when: cis_rhel8_5_5_3
+  with_items:
+    - /etc/bashrc
+    - /etc/profile
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.5.4 Ensure default group for the root account is GID 0 (Scored)
+  user:
+    name: root
+    group: "0"
+  when:
+    - cis_rhel8_5_5_4
+  tags:
+    - scored
+    - level1
+    - section5
+
+# TODO: add /etc/profile.d/*.sh
+- name: 5.5.5 Ensure default user umask is 027 or more restrictive (Scored)
+  replace:
+    dest: "{{ item }}"
+    regexp: '(^\s*umask\s+)\d+$'
+    replace: '\1{{ cis_rhel8_umask }}'
+  when:
+    - cis_rhel8_5_5_5
+  with_items:
+    - /etc/bashrc
+    - /etc/profile
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.6 Ensure root login is restricted to system console (Not Scored)
+  command: /bin/true
+  changed_when: false
+  when:
+    - cis_rhel8_5_6
+  tags:
+    - notscored
+    - level1
+    - section5
+    - notimplemented
+
+- name: 5.7 Ensure access to the su command is restricted (Scored)
+  block:
+    - name: 5.7 Ensure access to the su command is restricted (Scored) - pam config
+      lineinfile:
+        state: present
+        dest: /etc/pam.d/su
+        regexp: '^(#)?auth\s+required\s+pam_wheel\.so'
+        line: 'auth required pam_wheel.so use_uid'
+
+    - name: 5.7 Ensure access to the su command is restricted (Scored) - add role to wheel group
+      user:
+        name: root
+        groups: wheel
+  when:
+    - cis_rhel8_5_7
+  tags:
+    - scored
+    - level1
+    - section5

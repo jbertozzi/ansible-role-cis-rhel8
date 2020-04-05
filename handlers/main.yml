@@ -1,0 +1,62 @@
+---
+# handlers file for cis-rhel8
+- name: restart tmp.mount
+  become: true
+  systemd:
+    name: tmp.mount
+    daemon_reload: true
+    enabled: true
+    state: restarted
+
+- name: systemctl daemon-reload
+  systemd:
+    daemon_reload: true
+
+- name: restart chronyd
+  service:
+    name: chronyd
+    state: restarted
+
+- name: restart postfix
+  service:
+    name: postfix
+    state: restarted
+
+- name: sysctl flush ipv4 route
+  sysctl:
+    sysctl_set: true
+    name: net.ipv4.route.flush
+    value: 1
+  when: ansible_virtualization_type != "docker"
+
+- name: sysctl flush ipv6 route
+  sysctl:
+    sysctl_set: true
+    name: net.ipv6.route.flush
+    value: 1
+  when: ansible_virtualization_type != "docker"
+
+- name: update grub2
+  command: grub2-mkconfig –o /boot/grub2/grub.cfg
+
+- name: restart auditd
+  service:
+    name: auditd
+    state: restarted
+    use: service
+  when: ansible_virtualization_type != "docker"
+
+- name: restart sshd
+  service:
+    name: sshd
+    state: restarted
+
+- name: restart rsyslog
+  service:
+    name: sshd
+    state: restarted
+
+- name: restart journald
+  service:
+    name: systemd-journald
+    state: restarted

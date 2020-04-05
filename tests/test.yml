@@ -1,0 +1,77 @@
+---
+- hosts: localhost
+  remote_user: root
+  pre_tasks:
+      - name: Make sure cronie is installed (configured in section5 but needed before)
+        yum:
+          name:
+            - authselect
+            - chrony
+            - cronie
+            - grub2-tools-minimal
+            - nftables
+            - openssh-server
+            - python3-libselinux
+            - selinux-policy
+            - sssd
+          state: installed
+        tags:
+          - always
+      - name: sskygey
+        command: /usr/bin/ssh-keygen -A
+        changed_when: false
+        tags:
+          - always
+      - name: pretask
+        file:
+          name: /boot/grub2
+          state: directory
+        changed_when: false
+        tags:
+          - always
+      - name: pretask2
+        file:
+          name: /boot/grub2/grub.cfg
+          state: touch
+        changed_when: false
+        tags:
+          - always
+      - name: pretask2
+        file:
+          name: /boot/grub2/grubenv
+          state: touch
+        changed_when: false
+        tags:
+          - always
+      - name: pretask3
+        file:
+          name: /etc/default/grub
+          state: touch
+        changed_when: false
+        tags:
+          - always
+      - name: allow chronyd to start in container
+        lineinfile:
+          line: 'OPTIONS="-x"'
+          dest: /etc/sysconfig/chronyd
+          regexp: "OPTIONS=.*"
+      - name: fix issue with travis
+        shell: |
+          mkdir /lib/modules/$(uname -r)
+          touch /lib/modules/$(uname -r)/modules.{builtin,order}
+          for i in /sys/module/*; do echo kernel/${i##**/}.ko; done >> /lib/modules/$(uname -r)/modules.builtin
+          depmod -a
+        changed_when: false
+        tags:
+          - always
+  roles:
+    - role: cis-rhel8
+      vars:
+        cis_rhel8_1_1_2: false
+        cis_rhel8_1_1_3: false
+        cis_rhel8_1_1_4: false
+        cis_rhel8_1_1_5: false
+        cis_rhel8_3_5: false
+        cis_rhel8_6_1_10: false
+        cis_rhel8_6_1_11: false
+        cis_rhel8_6_1_12: false # /dev/tpmrm, docker device?

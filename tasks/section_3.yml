@@ -1,0 +1,621 @@
+---
+- name: 3.1.1 Ensure IP forwarding is disabled (Scored)
+  block:
+    - name: 3.1.1 Ensure IP forwarding is disabled (Scored) - ipv4
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: '0'
+        state: present
+        reload: true
+        sysctl_file: /etc/sysctl.d/cis.conf
+      notify:
+        - sysctl flush ipv4 route
+
+    - name: 3.1.1 Ensure IP forwarding is disabled (Scored) - ipv6
+      sysctl:
+        name: net.ipv6.conf.all.forwarding
+        value: '0'
+        state: present
+        reload: true
+        sysctl_file: /etc/sysctl.d/cis.conf
+      when:
+        - ansible_proc_cmdline["ipv6.disable"] is defined and ansible_proc_cmdline["ipv6.disable"] == 1
+        - not cis_rhel8_3_6
+      tags:
+        - scored
+        - level1
+        - section3
+      notify:
+        - sysctl flush ipv6 route
+  when:
+    - cis_rhel8_3_1_1
+  tags:
+    - scored
+    - level1
+    - section3
+
+- name: 3.1.2 Ensure packet redirect sending is disabled (Scored)
+  sysctl:
+    name: "{{ item }}"
+    value: '0'
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.d/cis.conf
+  with_items:
+    - net.ipv4.conf.all.send_redirects
+    - net.ipv4.conf.default.send_redirects
+  when:
+    - cis_rhel8_3_1_2
+  tags:
+    - scored
+    - level1
+    - section3
+  notify:
+    - sysctl flush ipv4 route
+
+- name: 3.2.1 Ensure source routed packets are not accepted (Scored)
+  block:
+    - name: 3.2.1 Ensure source routed packets are not accepted (Scored) - ipv4
+      sysctl:
+        name: "{{ item }}"
+        value: '0'
+        state: present
+        reload: true
+        sysctl_file: /etc/sysctl.d/cis.conf
+      with_items:
+        - net.ipv4.conf.all.accept_source_route
+        - net.ipv4.conf.default.accept_source_route
+      notify:
+        - sysctl flush ipv4 route
+
+    - name: 3.2.1 Ensure source routed packets are not accepted (Scored) - ipv6
+      sysctl:
+        name: "{{ item }}"
+        value: '0'
+        state: present
+        reload: true
+        sysctl_file: /etc/sysctl.d/cis.conf
+      with_items:
+        - net.ipv6.conf.all.accept_source_route
+        - net.ipv6.conf.default.accept_source_route
+      when:
+        - ansible_proc_cmdline["ipv6.disable"] is defined and ansible_proc_cmdline["ipv6.disable"] == 1
+        - not cis_rhel8_3_6
+      tags:
+        - scored
+        - level1
+        - section3
+      notify:
+        - sysctl flush ipv6 route
+  when:
+    - cis_rhel8_3_2_1
+  tags:
+    - scored
+    - level1
+    - section3
+
+- name: 3.2.2 Ensure ICMP redirects are not accepted (Scored)
+  block:
+    - name: 3.2.2 Ensure ICMP redirects are not accepted (Scored) - ipv4
+      sysctl:
+        name: net.ipv4.conf.all.accept_redirects
+        value: '0'
+        state: present
+        reload: true
+        sysctl_file: /etc/sysctl.d/cis.conf
+      notify:
+        - sysctl flush ipv4 route
+
+    - name: 3.2.2 Ensure ICMP redirects are not accepted (Scored) - ipv6
+      sysctl:
+        name: net.ipv6.conf.all.accept_redirects
+        value: '0'
+        state: present
+        reload: true
+        sysctl_file: /etc/sysctl.d/cis.conf
+      when:
+        - ansible_proc_cmdline["ipv6.disable"] is defined and ansible_proc_cmdline["ipv6.disable"] == 1
+        - not cis_rhel8_3_6
+      tags:
+        - scored
+        - level1
+        - section3
+      notify:
+        - sysctl flush ipv6 route
+  when:
+    - cis_rhel8_3_2_2
+  tags:
+    - scored
+    - level1
+    - section3
+
+- name: 3.2.3 Ensure secure ICMP redirects are not accepted (Scored)
+  sysctl:
+    name: "{{ item }}"
+    value: '0'
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.d/cis.conf
+  with_items:
+    - net.ipv4.conf.default.secure_redirects
+    - net.ipv4.conf.all.secure_redirects
+  when:
+    - cis_rhel8_3_2_3
+  tags:
+    - scored
+    - level1
+    - section3
+  notify:
+    - sysctl flush ipv4 route
+
+- name: 3.2.4 Ensure suspicious packets are logged (Scored)
+  sysctl:
+    name: "{{ item }}"
+    value: '1'
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.d/cis.conf
+  with_items:
+    - net.ipv4.conf.all.log_martians
+    - net.ipv4.conf.default.log_martians
+  when:
+    - cis_rhel8_3_2_4
+  tags:
+    - scored
+    - level1
+    - section3
+  notify:
+    - sysctl flush ipv4 route
+
+- name: 3.2.5 Ensure broadcast ICMP requests are ignored (Scored)
+  sysctl:
+    name: "{{ item }}"
+    value: '1'
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.d/cis.conf
+  with_items:
+    - net.ipv4.icmp_echo_ignore_broadcasts
+  when:
+    - cis_rhel8_3_2_5
+  tags:
+    - scored
+    - level1
+    - section3
+  notify:
+    - sysctl flush ipv4 route
+
+- name: 3.2.6 Ensure bogus ICMP responses are ignored (Scored)
+  sysctl:
+    name: "{{ item }}"
+    value: '1'
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.d/cis.conf
+  with_items:
+    - net.ipv4.icmp_ignore_bogus_error_responses
+  when:
+    - cis_rhel8_3_2_6
+  tags:
+    - scored
+    - level1
+    - section3
+  notify:
+    - sysctl flush ipv4 route
+
+- name: 3.2.7 Ensure Reverse Path Filtering is enabled (Scored)
+  sysctl:
+    name: "{{ item }}"
+    value: '1'
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.d/cis.conf
+  with_items:
+    - net.ipv4.conf.all.rp_filter
+    - net.ipv4.conf.default.rp_filter
+  when:
+    - cis_rhel8_3_2_7
+  tags:
+    - scored
+    - level1
+    - section3
+  notify:
+    - sysctl flush ipv4 route
+
+- name: 3.2.8 Ensure TCP SYN Cookies is enabled (Scored)
+  sysctl:
+    name: net.ipv4.tcp_syncookies
+    value: '1'
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.d/cis.conf
+  when:
+    - cis_rhel8_3_2_8
+  tags:
+    - scored
+    - level1
+    - section3
+  notify:
+    - sysctl flush ipv4 route
+
+- name: 3.2.9 Ensure IPv6 router advertisements are not accepted (Scored)
+  sysctl:
+    name: "{{ item }}"
+    value: '1'
+    state: present
+    reload: true
+    sysctl_file: /etc/sysctl.d/cis.conf
+  with_items:
+    - net.ipv6.conf.all.accept_ra
+    - net.ipv6.conf.default.accept_ra
+    - net.ipv6.conf.all.accept_ra
+    - net.ipv6.conf.default.accept_ra
+  when:
+    - cis_rhel8_3_2_9
+    - ansible_proc_cmdline["ipv6.disable"] is defined and ansible_proc_cmdline["ipv6.disable"] == 1
+    - not cis_rhel8_3_6
+  tags:
+    - scored
+    - level1
+    - section3
+  notify:
+    - sysctl flush ipv6 route
+
+- name: 3.3.1 Ensure DCCP is disabled (Scored)
+  lineinfile:
+    dest: /etc/modprobe.d/cis.conf
+    regexp: "^(#)?\\s*install\\s+dccp(\\s*|$)"
+    line: "install dccp /bin/true"
+    state: present
+    owner: root
+    group: root
+    mode: 0644
+    create: true
+  when:
+      - cis_rhel8_3_3_1
+  tags:
+    - scored
+    - level2
+    - section3
+
+- name: 3.3.2 Ensure SCTP is disabled (Scored)
+  lineinfile:
+    dest: /etc/modprobe.d/cis.conf
+    regexp: "^(#)?\\s*install\\s+sctp(\\s*|$)"
+    line: "install sctp /bin/true"
+    state: present
+    owner: root
+    group: root
+    mode: 0644
+    create: true
+  when:
+      - cis_rhel8_3_3_2
+  tags:
+    - scored
+    - level2
+    - section3
+
+- name: 3.3.3 Ensure RDS is disabled (Scored)
+  lineinfile:
+    dest: /etc/modprobe.d/cis.conf
+    regexp: "^(#)?\\s*install\\s+rds(\\s*|$)"
+    line: "install rds /bin/true"
+    state: present
+    owner: root
+    group: root
+    mode: 0644
+    create: true
+  when:
+      - cis_rhel8_3_3_3
+  tags:
+    - scored
+    - level2
+    - section3
+
+- name: 3.3.4 Ensure TIPC is disabled (Scored)
+  lineinfile:
+    dest: /etc/modprobe.d/cis.conf
+    regexp: "^(#)?\\s*install\\s+tips(\\s*|$)"
+    line: "install tips /bin/true"
+    state: present
+    owner: root
+    group: root
+    mode: 0644
+    create: true
+  when:
+      - cis_rhel8_3_3_4
+  tags:
+    - scored
+    - section2
+    - section3
+
+- name: 3.4.1.1 Ensure a Firewall package is installed (Scored)
+  yum:
+    name: "{{ cis_rhel8_firewall_package }}"
+    state: installed
+  tags:
+    - scored
+    - level1
+    - section3
+
+- name: 3.4.2 Configure firewalld
+  block:
+    - name: 3.4.2.1 Ensure firewalld service is enabled and running (Scored)
+      service:
+        name: firewalld
+        state: started
+        enabled: true
+      when:
+        - cis_rhel8_3_4_2_1
+      tags:
+        - scored
+        - level1
+        - section3
+
+    - name: 3.4.2.2 Ensure iptables is not enabled (Scored)
+      service:
+        name: iptables
+        state: stopped
+        enabled: false
+      when:
+        - cis_rhel8_3_4_2_2
+        - "'iptables-services' in ansible_facts.packages"
+      tags:
+        - scored
+        - level1
+        - section3
+
+    - name: 3.4.2.3 Ensure nftables is not enabled (Scored)
+      systemd:
+        name: nftables
+        masked: true
+        state: stopped
+        enabled: false
+      when:
+        - cis_rhel8_3_4_2_3
+        - "'nftables' in ansible_facts.packages"
+      tags:
+        - scored
+        - level1
+        - section3
+
+    - name: 3.4.2.4 Ensure default zone is set (Scored)
+      command: firewall-cmd --set-default-zone {{ cis_rhel8_firewall_default_zone }}
+      register: set_default_zone
+      changed_when: "'Warning: ZONE_ALREADY_SET' not in set_default_zone.stderr"
+      when:
+        - cis_rhel8_3_4_2_4
+      tags:
+        - scored
+        - level1
+        - section3
+
+    - name: 3.4.2.5 Ensure network interfaces are assigned to appropriate zone (Not Scored)
+      command: /bin/true
+      changed_when: false
+      when:
+        -cis_rhel8_3_4_2_5
+      tags:
+        - notscored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.2.6 Ensure unnecessary services and ports are not accepted (Not Scored)
+      command: /bin/true
+      changed_when: false
+      when:
+        - cis_rhel8_3_4_2_6
+      tags:
+        - notscored
+        - level1
+        - section3
+        - notimplemented
+
+  when:
+    cis_rhel8_firewall_package == "firewalld"
+
+- name: 3.4.3 Configure nftables
+  block:
+    - name: 3.4.3.1 Ensure iptables are flushed (Not Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - notscored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.3.2 Ensure a table exists (Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - scored
+        - level1
+        - section3
+        - notimplmented
+
+    - name: 3.4.3.3 Ensure base chains exist (Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - scored
+        - level1
+        - section3
+        - notimplmented
+
+    - name: 3.4.3.4 Ensure loopback traffic is configured (Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - scored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.3.5 Ensure outbound and established connections are configured (Not Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - notscored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.3.6 Ensure default deny firewall policy (Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - scored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.3.7 Ensure nftables service is enabled (Scored)
+      service:
+        name: nftables
+        state: started
+      changed_when: false
+      tags:
+        - scored
+        - level1
+        - section3
+
+    - name: 3.4.3.8 Ensure nftables rules are permanent (Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - scored
+        - level1
+        - section3
+        - notimplemented
+  when:
+    - cis_rhel8_firewall_package == "nftables"
+
+- name: 3.4.4.1 Configure IPv4 iptables
+  block:
+    - name: 3.4.4.1.1 Ensure default deny firewall policy (Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - scored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.4.1.2 Ensure loopback traffic is configured (Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - scored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.4.1.3 Ensure outbound and established connections are configured (Not Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - notscored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.4.1.4 Ensure firewall rules exist for all open ports (Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - scored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.4.2.1 Ensure IPv6 default deny firewall policy (Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - scored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.4.2.2 Ensure IPv6 loopback traffic is configured (Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - scored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.4.2.3 Ensure IPv6 outbound and established connections are configured (Not Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - notscored
+        - level1
+        - section3
+        - notimplemented
+
+    - name: 3.4.4.2.4 Ensure IPv6 firewall rules exist for all open ports (Not Scored)
+      command: /bin/true
+      changed_when: false
+      tags:
+        - notscored
+        - level1
+        - section3
+        - notimplemented
+  when:
+    - cis_rhel8_firewall_package == "iptables"
+
+- name: 3.5 Ensure wireless interfaces are disabled (Scored)
+  block:
+    - name: 3.5 Ensure wireless interfaces are disabled (Scored) - get wireless status
+      shell: |
+        set -o pipefail
+        nmcli radio all | awk '$1 !~ /WIFI/{ print $2}'
+      register: wireless_status
+      changed_when: false
+
+    - name: 3.5 Ensure wireless interfaces are disabled (Scored)
+      command: nmcli radio all off
+      when:
+        - wireless_status.stdout == 'enabled'
+  when:
+    - cis_rhel8_3_5
+  tags:
+    - scored
+    - level1
+    - section3
+
+- name: 3.6 Disable IPv6 (Not Scored) - read config
+  command: grep -E "GRUB_CMDLINE_LINUX=.*ipv6.disable=1.*" /etc/default/grub
+  register: grep_ipv6_grub
+  failed_when: false
+  changed_when: false
+  when:
+    - cis_rhel8_3_6
+  tags:
+    - notscored
+    - level2
+    - section3
+
+- name: 3.6 Disable IPv6 (Not Scored) - write config
+  lineinfile:
+    dest: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX="(.*)"$'
+    line: 'GRUB_CMDLINE_LINUX="\1 ipv6.disable=1"'
+    state: present
+    owner: root
+    group: root
+    mode: 0644
+    backrefs: true
+  when:
+    - cis_rhel8_3_6
+    - grep_ipv6_grub.rc == 1
+  tags:
+    - notscored
+    - level2
+    - section3
+  notify:
+    - update grub2

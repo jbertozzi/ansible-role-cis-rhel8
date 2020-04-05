@@ -1,0 +1,69 @@
+---
+- name: Converge
+  hosts: all
+  pre_tasks:
+    - name: Install needed package to avoid issue during CI # build an image for that?
+      yum:
+        name:
+          - authselect
+          - chrony
+          - cronie
+          - grub2-tools-minimal
+          - nftables
+          - openssh-server
+          - python3-libselinux
+          - selinux-policy
+          - sssd
+        state: installed
+
+    - name: sshd does not have key unless it starts
+      command: /usr/bin/ssh-keygen -A
+      changed_when: false
+
+    - name: Set up minimal grub file
+      block:
+        - file:
+            name: /boot/grub2
+            state: directory
+          changed_when: false
+        - file:
+            name: /boot/grub2/grub.cfg
+            state: touch
+          changed_when: false
+        - file:
+            name: /boot/grub2/grubenv
+            state: touch
+          changed_when: false
+        - file:
+            name: /etc/default/grub
+            state: touch
+          changed_when: false
+        - name: fix issue with travis
+          shell: |
+            mkdir /lib/modules/$(uname -r)
+            touch /lib/modules/$(uname -r)/modules.{builtin,order}
+            for i in /sys/module/*; do echo kernel/${i##**/}.ko; done >> /lib/modules/$(uname -r)/modules.builtin
+            depmod -a
+          args:
+            warn: false
+          changed_when: false
+
+    - name: allow chronyd to start in container
+      lineinfile:
+        line: 'OPTIONS="-x"'
+        dest: /etc/sysconfig/chronyd
+        regexp: "OPTIONS=.*"
+
+  roles:
+    - role: cis-rhel8
+      vars:
+        # FS related
+        cis_rhel8_1_1_2: false
+        cis_rhel8_1_1_3: false
+        cis_rhel8_1_1_4: false
+        cis_rhel8_1_1_5: false
+        # NetworkManager
+        cis_rhel8_3_5: false
+        # some device file created by docker?
+        cis_rhel8_6_1_10: false
+        cis_rhel8_6_1_12: false

@@ -1,0 +1,14 @@
+---
+- name: Gather package facts
+  package_facts:
+    manager: auto
+  changed_when: false
+  tags:
+    - always
+
+- name: List users accounts
+  command: "awk -F: '{print $1}' /etc/passwd"
+  register: users
+  changed_when: false
+  tags:
+    - always

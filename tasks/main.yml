@@ -1,0 +1,37 @@
+---
+# tasks file for cis-rhel8
+
+- include_tasks: pre.yml
+  tags:
+    - always
+    - pre
+
+- name: Initial Setup
+  include_tasks: section_1.yml
+  when: cis_rhel8_section1
+  tags: section1
+
+- name: Services
+  include_tasks: section_2.yml
+  when: cis_rhel8_section2
+  tags: section2
+
+- name: Network Confguration
+  include_tasks: section_3.yml
+  when: cis_rhel8_section3
+  tags: section3
+
+- name: Logging and Auditing
+  include_tasks: section_4.yml
+  when: cis_rhel8_section4
+  tags: section4
+
+- name: Access, Authentication and Authorization
+  include_tasks: section_5.yml
+  when: cis_rhel8_section5
+  tags: section5
+
+- name: System Maintenance
+  include_tasks: section_6.yml
+  when: cis_rhel8_section6
+  tags: section6

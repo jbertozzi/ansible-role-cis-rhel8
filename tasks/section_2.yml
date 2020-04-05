@@ -1,0 +1,318 @@
+---
+- name: 2.1.1 Ensure xinetd is not installed (Scored)
+  yum:
+    name: xinetd
+    state: absent
+  when:
+    - cis_rhel8_2_1_1
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.1.1 Ensure time synchronization is in use (Not Scored) - package installed
+  yum:
+    name: chrony
+    state: installed
+  when:
+    - cis_rhel8_2_2_1_1
+  tags:
+    - notscored
+    - level1
+    - section2
+
+- name: 2.2.1.1 Ensure time synchronization is in use (Not Scored) - service started / enabled
+  service:
+    name: chronyd
+    state: started
+    enabled: true
+  when:
+    - cis_rhel8_2_2_1_1
+  tags:
+    - notscored
+    - level1
+    - section2
+
+- name: 2.2.1.2 Ensure chrony is configured (Scored)
+  template:
+    src: etc/chrony.conf.j2
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - scored
+    - level1
+    - section2
+  notify: restart chronyd
+
+- name: 2.2.2 Ensure X Window System is not installed (Scored)
+  yum:
+    name: xorg-x11*
+    state: absent
+  when: cis_rhel8_2_2_2
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.3 Ensure rsync service is not enabled (Scored)
+  service:
+    name: rsyncd
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_3
+    - "'rsync-daemon' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.4 Ensure Avahi Server is not enabled (Scored)
+  service:
+    name: avahi-daemon
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_4
+    - "'avahi' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.5 Ensure SNMP Server is not enabled (Scored)
+  service:
+    name: snmpd
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_5
+    - "'net-snmp' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.6 Ensure HTTP Proxy Server is not enabled (Scored)
+  service:
+    name: squid
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_6
+    - "'squid' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.7 Ensure Samba is not enabled (Scored)
+  service:
+    name: smb
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_7
+    - "'samba' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.8 Ensure IMAP and POP3 server is not enabled (Scored)
+  service:
+    name: dovecot
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_8
+    - "'dovecot' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.9 Ensure HTTP server is not enabled (Scored)
+  service:
+    name: httpd
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_9
+    - "'httpd' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.10 Ensure FTP Server is not enabled (Scored)
+  service:
+    name: vsfptd
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_10
+    - "'vsftpd' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.11 Ensure DNS Server is not enabled (Scored)
+  service:
+    name: named
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_11
+    - "'bind' in ansible_facts.packages or 'bind-chroot' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.12 Ensure NFS is not enabled (Scored)
+  service:
+    name: nfs-server
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_12
+    - "'nfs-utils' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.13 Ensure RPC is not enabled (Scored)
+  service:
+    name: rpcbind
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_13
+    - "'rpcbind' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+# slapd not provided anymore, neither by rhel nor epel
+- name: 2.2.14 Ensure LDAP server is not enabled (Scored)
+  service:
+    name: slapd
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_14
+    - "'slapd' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.15 Ensure DHCP Server is not enabled (Scored)
+  service:
+    name: dhcpd
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_15
+    - "'dhcpd' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.16 Ensure CUPS is not enabled (Scored)
+  service:
+    name: cups
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_16
+    - "'cups' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.17 Ensure NIS Server is not enabled (Scored)
+  service:
+    name: ypserv
+    state: stopped
+    enabled: false
+  when:
+    - cis_rhel8_2_2_17
+    - "'ypserv' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.18 Ensure mail transfer agent is configured for local-only mode (Scored) - search tcp port
+  shell: |
+    set -o pipefail
+    ss -lntu | grep -E ':25\\s' | grep -E -v '\\s(127.0.0.1|\\[::1\\]):25\\s'
+  changed_when: false
+  failed_when: false
+  when:
+    - cis_rhel8_2_2_18
+    - "'postfix' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.2.18 Ensure mail transfer agent is configured for local-only mode (Scored) - write config
+  lineinfile:
+    path: /etc/postfix/main.cf
+    regexp: "^\\s*inet_interfaces\\s*=.*$"
+    line: inet_interfaces = localhost
+    state: present
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - cis_rhel8_2_2_18
+    - "'postfix' in ansible_facts.packages"
+  tags:
+    - scored
+    - level1
+    - section2
+  notify: restart postfix
+
+- name: 2.3.1 Ensure NIS Client is not installed (Scored)
+  yum:
+    name: ypbind
+    state: absent
+  when:
+    - cis_rhel8_2_3_1
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.3.2 Ensure telnet client is not installed (Scored)
+  yum:
+    name: telnet
+    state: absent
+  when:
+    - cis_rhel8_2_3_2
+  tags:
+    - scored
+    - level1
+    - section2
+
+- name: 2.3.3 Ensure LDAP client is not installed (Scored)
+  yum:
+    name: openldap-clients
+    state: absent
+  when:
+    - cis_rhel8_2_3_3
+  tags:
+    - scored
+    - level1
+    - section2
