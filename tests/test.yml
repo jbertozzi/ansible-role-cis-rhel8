@@ -56,14 +56,32 @@
           dest: /etc/sysconfig/chronyd
           regexp: "OPTIONS=.*"
       - name: fix issue with travis
-        shell: |
-          mkdir /lib/modules/$(uname -r)
-          touch /lib/modules/$(uname -r)/modules.{builtin,order}
-          for i in /sys/module/*; do echo kernel/${i##**/}.ko; done >> /lib/modules/$(uname -r)/modules.builtin
-          depmod -a
-        changed_when: false
-        tags:
-          - always
+        block:
+          - name: Create directory
+            file:
+              path: /lib/modules/{{ ansible_kernel }}
+              state: directory
+            changed_when: false
+          - name: Create some files
+            file:
+              path: lib/modules/{{ ansible_kernel }}/{{ item }}
+              state: touch
+            changed_when: false
+            with_items:
+              - builtin
+              - order
+          - name: Avoid firewalld to crash in docker
+            shell: |
+              for i in /sys/module/*; do echo kernel/${i##**/}.ko; done >> /lib/modules/$(uname -r)/modules.builtin
+              depmod -a
+            args:
+              warn: false
+            changed_when: false
+      - name: allow chronyd to start in container
+        lineinfile:
+          line: 'OPTIONS="-x"'
+          dest: /etc/sysconfig/chronyd
+          regexp: "OPTIONS=.*"
   roles:
     - role: cis-rhel8
       vars:

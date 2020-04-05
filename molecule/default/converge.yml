@@ -20,7 +20,7 @@
       command: /usr/bin/ssh-keygen -A
       changed_when: false
 
-    - name: Set up minimal grub file
+    - name: Set up minimal grub files
       block:
         - name: Make sure /boot/grub2 exists
           file:
@@ -42,10 +42,24 @@
             name: /etc/default/grub
             state: touch
           changed_when: false
-        - name: fix issue with travis
+
+    - name: fix issue with travis
+      block:
+        - name: Create directory
+          file:
+            path: /lib/modules/{{ ansible_kernel }}
+            state: directory
+          changed_when: false
+        - name: Create some files
+          file:
+            path: lib/modules/{{ ansible_kernel }}/{{ item }}
+            state: touch
+          changed_when: false
+          with_items:
+            - builtin
+            - order
+        - name: Avoid firewalld to crash in docker
           shell: |
-            mkdir /lib/modules/$(uname -r)
-            touch /lib/modules/$(uname -r)/modules.{builtin,order}
             for i in /sys/module/*; do echo kernel/${i##**/}.ko; done >> /lib/modules/$(uname -r)/modules.builtin
             depmod -a
           args:
@@ -56,7 +70,6 @@
         line: 'OPTIONS="-x"'
         dest: /etc/sysconfig/chronyd
         regexp: "OPTIONS=.*"
-
   roles:
     - role: cis-rhel8
       vars:
