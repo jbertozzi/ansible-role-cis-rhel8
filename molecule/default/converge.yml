@@ -22,19 +22,23 @@
 
     - name: Set up minimal grub file
       block:
-        - file:
+        - name: Make sure /boot/grub2 exists
+          file:
             name: /boot/grub2
             state: directory
           changed_when: false
-        - file:
+        - name: Make sure /boot/grub2/grub.cfg exists
+          file:
             name: /boot/grub2/grub.cfg
             state: touch
           changed_when: false
-        - file:
+        - name: Make sure /boot/grub2/grubenv exists
+          file:
             name: /boot/grub2/grubenv
             state: touch
           changed_when: false
-        - file:
+        - name: Make sure /etc/default/grub exists
+          file:
             name: /etc/default/grub
             state: touch
           changed_when: false
@@ -47,7 +51,6 @@
           args:
             warn: false
           changed_when: false
-
     - name: allow chronyd to start in container
       lineinfile:
         line: 'OPTIONS="-x"'
