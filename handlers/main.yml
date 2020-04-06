@@ -28,7 +28,7 @@
     name: net.ipv4.route.flush
     value: 1
   when:
-    - ansible_virtualization_type != "docker" 
+    - ansible_virtualization_type != "docker"
     #  https://github.com/ansible/ansible/issues/64954, personal test using podman
     - ansible_virtualization_type != "kvm"
 
@@ -38,7 +38,7 @@
     name: net.ipv6.route.flush
     value: 1
   when:
-    - ansible_virtualization_type != "docker" 
+    - ansible_virtualization_type != "docker"
     #  https://github.com/ansible/ansible/issues/64954, personal test using podman
     - ansible_virtualization_type != "kvm"
 
@@ -51,7 +51,7 @@
     state: restarted
     use: service
   when:
-    - ansible_virtualization_type != "docker" 
+    - ansible_virtualization_type != "docker"
     #  https://github.com/ansible/ansible/issues/64954, personal test using podman
     - ansible_virtualization_type != "kvm"
 
