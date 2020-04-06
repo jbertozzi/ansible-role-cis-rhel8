@@ -238,7 +238,7 @@
     - section4
 
 - name: 4.2.1.3 Ensure rsyslog default file permissions configured (Scored) - find config
-  shell: find /etc/rsyslog.d/ -name "*.conf"
+  command: find /etc/rsyslog.d/ -name "*.conf"
   register: rsyslog_config_files
   failed_when: false
   changed_when: false
@@ -350,15 +350,13 @@
 - name: 4.2.3 Ensure permissions on all logfiles are configured (Scored)
   block:
   - name: 4.2.3 Ensure permissions on all logfiles are configured (Scored) - find files
-    shell: |
-      find /var/log -type f -perm /037
+    command: find /var/log -type f -perm /037
     register: logfile_wrong_permissions
     failed_when: false
     changed_when: false
 
   - name: 4.2.3 Ensure permissions on all logfiles are configured (Scored) - find directories
-    shell: |
-      find /var/log -type d -perm /026
+    command: find /var/log -type d -perm /026
     register: logdir_wrong_permissions
     failed_when: false
     changed_when: false
