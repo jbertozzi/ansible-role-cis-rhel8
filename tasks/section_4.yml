@@ -10,8 +10,6 @@
     - level2
     - section4
 
-- debug: var=ansible_virtualization_type
-
 - name: 4.1.1.2 Ensure auditd service is enabled (Scored)
   service:
     name: auditd
@@ -20,6 +18,8 @@
   when:
     - cis_rhel8_4_1_1_2
     - ansible_virtualization_type != "docker"
+    #  https://github.com/ansible/ansible/issues/64954, personal test using podman
+    - ansible_virtualization_type != "kvm"
   tags:
     - scored
     - level2
