@@ -64,7 +64,7 @@
             changed_when: false
           - name: Create some files
             file:
-              path: lib/modules/{{ ansible_kernel }}/{{ item }}
+              path: /lib/modules/{{ ansible_kernel }}/{{ item }}
               state: touch
             changed_when: false
             with_items:
