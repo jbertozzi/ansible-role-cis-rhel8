@@ -711,8 +711,8 @@
 - name: 5.5.5 Ensure default user umask is 027 or more restrictive (Scored)
   replace:
     dest: "{{ item }}"
-    regexp: '(^\s*umask\s+)\d+$'
-    replace: '\1{{ cis_rhel8_umask }}'
+    regexp: '^(\s*umask\s+)\d+$'
+    replace: '\g<1>{{ cis_rhel8_umask }}'
   when:
     - cis_rhel8_5_5_5
   with_items:
