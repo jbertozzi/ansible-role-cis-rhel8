@@ -79,7 +79,9 @@
 
 {% if cis_rhel8_4_1_13 %}
 # CIS 4.1.13
-# TODO
+{% for binary in priv_binaries.results[0].stdout_lines %}
+-a always,exit -F path={{ binary }} -F perm=x -F auid>={{ cis_rhel8_min_uid }} -F auid!=4294967295 -k privileged
+{% endfor %}
 {% endif %}
 
 {% if cis_rhel8_4_1_14 %}

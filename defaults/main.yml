@@ -213,6 +213,9 @@ cis_rhel8_4_3: true
 # 4.1.1.4
 cis_rhel8_audit_backlog_limit: 8192
 cis_rhel8_audit_max_log_file: 8
+# 4.1.13
+cis_rhel8_priv_partitions:
+  - /
 # 4.2.1.3
 cis_rhel8_rsyslog_file_mode: "0640"
 # 4.2.1.5
