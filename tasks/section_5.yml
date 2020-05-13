@@ -686,7 +686,7 @@
     dest: "{{ item }}"
     create: true
     regexp: '^TMOUT='
-    line: "readonly TMOUT={{ cis_rhel8_shell_timeout }} ; export TMOUT"
+    line: "TMOUT={{ cis_rhel8_shell_timeout }} ; export TMOUT"
   when: cis_rhel8_5_5_3
   with_items:
     - /etc/bashrc
