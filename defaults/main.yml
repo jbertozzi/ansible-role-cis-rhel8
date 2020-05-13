@@ -65,9 +65,11 @@ cis_rhel8_1_11: true
 # 1.1.2
 cis_rhel8_tmp_size: 1G
 # 1.1.3
-cis_rhel8_iologfiles: /var/log/sudo.log
+cis_rhel8_sudo_logfile: /var/log/sudo.log
 #.1.15
 cis_rhel8_shm_size: 65536k
+# 1.3.2 and 1.3.3
+cis_rhel8_sudoersd_user: root
 # 1.4.2
 cis_rhel8_aide_cron:
   weekday: "*"
