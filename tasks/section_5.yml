@@ -99,8 +99,25 @@
     dest: "{{ item }}"
     state: absent
   with_items:
+    - /etc/at.deny
     - /etc/cron.deny
     - /etc/cron.allow
+  when:
+    - cis_rhel8_5_1_8
+  tags:
+    - scored
+    - level1
+    - section5
+
+- name: 5.1.8 Ensure at/cron is restricted to authorized users (Scored)
+  file:
+    dest: "{{ item }}"
+    state: present
+    mode: '0700'
+    owner: root
+  with_items:
+    - /etc/cron.allow
+    - /etc/at.allow
   when:
     - cis_rhel8_5_1_8
   tags:
