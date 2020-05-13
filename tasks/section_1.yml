@@ -297,7 +297,7 @@
     - name: 1.2.4 Ensure gpgcheck is globally activated (Scored) - find repositories
       shell: |
         set -o pipefail
-        grep -EH '\[.*\]' /etc/yum.repos.d/*.repo | sed 's/\[\(.*\)\]/\1/g'
+        "grep -EH '\[.*\]' /etc/yum.repos.d/*.repo | grep -v '#' | sed 's/\[\(.*\)\]/\1/g'"
       register: yum_repositories
       changed_when: false
       failed_when: false
