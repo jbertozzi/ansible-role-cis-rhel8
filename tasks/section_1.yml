@@ -379,8 +379,8 @@
     - section1
 
 - name: 1.3.3 Ensure sudo log file exists (Scored) - search config
-  command: grep -Er '^\s*Defaults\s+([^#]+,\s*)?iolog_file\s*=' /etc/sudoers /etc/sudoers.d
-  register: iolog_files
+  command: grep -Er '^\s*Defaults\s+([^#]+,\s*)?logfile\s*=' /etc/sudoers /etc/sudoers.d
+  register: sudo_logfiles
   changed_when: false
   failed_when: false
   when:
@@ -392,8 +392,8 @@
 
 - name: 1.3.3 Ensure sudo log file exists (Scored) - write config
   lineinfile:
-    dest: /etc/sudoers.d/{{ ansible_user_id }}
-    line: "Defaults iolog_files={{ cis_rhel8_iologfiles }}"
+    dest: /etc/sudoers.d/{{ ansible_user_id }}
+    line: "Defaults logfile={{ cis_rhel8_iologfiles }}"
     state: present
     owner: root
     group: root
@@ -401,7 +401,7 @@
     create: true
   when:
     - cis_rhel8_1_3_3
-    - iolog_files.rc == 1
+    - sudo_logfiles.rc == 1
   tags:
     - scored
     - level1
