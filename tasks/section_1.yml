@@ -399,6 +399,7 @@
     group: root
     mode: 0644
     create: true
+    validate: 'visudo -cf %s'
   when:
     - cis_rhel8_1_3_3
     - sudo_logfiles.rc == 1
