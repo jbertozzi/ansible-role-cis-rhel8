@@ -393,7 +393,7 @@
 - name: 1.3.3 Ensure sudo log file exists (Scored) - write config
   lineinfile:
     dest: /etc/sudoers.d/{{ cis_rhel8_sudoersd_user }}
-    line: "Defaults logfile='{{ cis_rhel8_sudo_file }}'"
+    line: 'Defaults logfile="{{ cis_rhel8_sudo_file }}"'
     state: present
     owner: root
     group: root
