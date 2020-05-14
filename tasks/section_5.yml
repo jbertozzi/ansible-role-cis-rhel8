@@ -112,7 +112,7 @@
 - name: 5.1.8 Ensure at/cron is restricted to authorized users (Scored)
   file:
     dest: "{{ item }}"
-    state: present
+    state: touch
     mode: '0700'
     owner: root
   with_items:
