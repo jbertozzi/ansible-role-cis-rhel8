@@ -314,6 +314,9 @@ cis_rhel8_pass_min_days: 7
 cis_rhel8_pass_warn_age: 7
 # 5.5.1.4
 cis_rhel8_useradd_inactive: 30
+# 5.1.8
+cis_rhel8_cron_allow_users: []
+cis_rhel8_at_allow_users: []
 # 5.5.2
 cis_rhel8_min_uid: 1000
 # 5.5.3
