@@ -349,11 +349,25 @@
     - level1
     - section1
 
-- name: 1.3.2 Ensure sudo commands use pty (Scored) - search config
-  command: grep -Er '^\s*Defaults\s+([^#]+,\s*)?use_pty\s*=' /etc/sudoers /etc/sudoers.d
-  register: use_pty
-  changed_when: false
-  failed_when: false
+- name: 1.3.2 Ensure sudo commands use pty (Scored)
+  block:
+  - name: 1.3.2 Ensure sudo commands use pty (Scored) - search config
+    command: grep -Er '^\s*Defaults\s+([^#]+,\s*)?use_pty\s*=' /etc/sudoers /etc/sudoers.d
+    register: use_pty
+    changed_when: false
+    failed_when: false
+
+  - name: 1.3.2 Ensure sudo commands use pty (Scored) - write config
+    lineinfile:
+      dest: /etc/sudoers.d/{{ cis_rhel8_sudoers_file }}
+      line: "Defaults use_pty"
+      state: present
+      owner: root
+      group: root
+      mode: 0400
+      create: true
+    when:
+      - use_pty.rc == 1
   when:
     - cis_rhel8_1_3_2
   tags:
@@ -361,48 +375,28 @@
     - level1
     - section1
 
-- name: 1.3.2 Ensure sudo commands use pty (Scored) - write config
-  lineinfile:
-    dest: /etc/sudoers.d/{{ cis_rhel8_sudoers_file }}
-    line: "Defaults use_pty"
-    state: present
-    owner: root
-    group: root
-    mode: 0644
-    create: true
-  when:
-    - cis_rhel8_1_3_2
-    - use_pty.rc == 1
-  tags:
-    - scored
-    - level1
-    - section1
+- name: 1.3.3 Ensure sudo log file exists (Scored)
+  block:
+  - name: 1.3.3 Ensure sudo log file exists (Scored) - search config
+    command: grep -Er '^\s*Defaults\s+([^#]+,\s*)?logfile\s*=' /etc/sudoers /etc/sudoers.d
+    register: sudo_logfiles
+    changed_when: false
+    failed_when: false
 
-- name: 1.3.3 Ensure sudo log file exists (Scored) - search config
-  command: grep -Er '^\s*Defaults\s+([^#]+,\s*)?logfile\s*=' /etc/sudoers /etc/sudoers.d
-  register: sudo_logfiles
-  changed_when: false
-  failed_when: false
+  - name: 1.3.3 Ensure sudo log file exists (Scored) - write config
+    lineinfile:
+      dest: /etc/sudoers.d/{{ cis_rhel8_sudoers_file }}
+      line: 'Defaults logfile="{{ cis_rhel8_sudo_logfile }}"'
+      state: present
+      owner: root
+      group: root
+      mode: 0400
+      create: true
+      validate: 'visudo -cf %s'
+    when:
+      - sudo_logfiles.rc == 1
   when:
     - cis_rhel8_1_3_3
-  tags:
-    - scored
-    - level1
-    - section1
-
-- name: 1.3.3 Ensure sudo log file exists (Scored) - write config
-  lineinfile:
-    dest: /etc/sudoers.d/{{ cis_rhel8_sudoers_file }}
-    line: 'Defaults logfile="{{ cis_rhel8_sudo_logfile }}"'
-    state: present
-    owner: root
-    group: root
-    mode: 0600
-    create: true
-    validate: 'visudo -cf %s'
-  when:
-    - cis_rhel8_1_3_3
-    - sudo_logfiles.rc == 1
   tags:
     - scored
     - level1
