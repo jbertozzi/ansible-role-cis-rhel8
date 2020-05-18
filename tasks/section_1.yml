@@ -397,7 +397,7 @@
     state: present
     owner: root
     group: root
-    mode: 0644
+    mode: 0600
     create: true
     validate: 'visudo -cf %s'
   when:
