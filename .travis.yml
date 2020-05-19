@@ -4,7 +4,7 @@ language: python
 services: docker
 
 install:
-  - pip install ansible molecule yamllint ansible-lint docker mitogen
+  - pip install ansible molecule yamllint ansible-lint docker
 before_script:
   - cd ../
   - mv ansible-role-cis-rhel8 cis-rhel8
