@@ -362,7 +362,7 @@
   file:
     state: absent
     dest: "~{{ item }}/.forward"
-  with_items: "{{ users }}"
+  with_items: "{{ cis_users }}"
   when:
     - cis_rhel8_6_2_10
   tags:
@@ -374,7 +374,7 @@
   file:
     state: absent
     dest: "~{{ item }}/.netrc"
-  with_items: "{{ users }}"
+  with_items: "{{ cis_users }}"
   when:
     - cis_rhel8_6_2_11
   tags:
@@ -397,7 +397,7 @@
   file:
     state: absent
     dest: "~{{ item }}/.rhosts"
-  with_items: "{{ users }}"
+  with_items: "{{ cis_users }}"
   when:
     - cis_rhel8_6_2_13
   tags:
@@ -417,30 +417,34 @@
     - notimplemented
 
 - name: 6.2.15 Ensure no duplicate UIDs exist (Scored)
-  command: /bin/true
-  changed_when: false
+  shell: grep -cE "^[A-Za-z0-9_-]+:[A-Za-z0-9_-]+:{{ item }}:" /etc/passwd
+  register: grep_uid
+  changed_when: "grep_uid.stdout != '1'"
+  with_items: "{{ cis_uids.stdout_lines }}"
   when:
     - cis_rhel8_6_2_15
   tags:
     - scored
     - level1
     - section6
-    - notimplmented
 
 - name: 6.2.16 Ensure no duplicate GIDs exist (Scored)
-  command: /bin/true
-  changed_when: false
+  shell: grep -cE "^[A-Za-z0-9_-]+:x:{{ item }}:" /etc/group
+  register: grep_gid
+  changed_when: "grep_gid.stdout != '1'"
+  with_items: "{{ cis_gids.stdout_lines }}"
   when:
     - cis_rhel8_6_2_16
   tags:
     - scored
     - level1
     - section6
-    - notimplmented
 
 - name: 6.2.17 Ensure no duplicate user names exist (Scored)
-  command: /bin/true
-  changed_when: false
+  command: grep -cE "^{{ item }}:" /etc/passwd
+  register: grep_user_name
+  changed_when: "grep_user_name.stdout != '1'"
+  with_items: "{{ cis_users.stdout_lines }}"
   when:
     - cis_rhel8_6_2_17
   tags:
@@ -450,8 +454,10 @@
     - notimplmented
 
 - name: 6.2.18 Ensure no duplicate group names exist (Scored)
-  command: /bin/true
-  changed_when: false
+  command: grep -cE "^{{ item }}:" /etc/group
+  register: grep_group_name
+  with_items: "{{ cis_groups.stdout_lines }}"
+  changed_when: "grep_group_name.stdout != '1'"
   when:
     - cis_rhel8_6_2_18
   tags:

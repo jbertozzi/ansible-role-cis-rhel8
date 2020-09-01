@@ -8,7 +8,28 @@
 
 - name: List users accounts
   command: "awk -F: '{print $1}' /etc/passwd"
-  register: users
+  register: cis_users
+  changed_when: false
+  tags:
+    - always
+
+- name: List uids
+  command: "awk -F: '{print $3}' /etc/passwd"
+  register: cis_uids
+  changed_when: false
+  tags:
+    - always
+
+- name: List groups
+  command: "awk -F: '{print $1}' /etc/group"
+  register: cis_groups
+  changed_when: false
+  tags:
+    - always
+
+- name: List gids
+  command: "awk -F: '{print $3}' /etc/group"
+  register: cis_gids
   changed_when: false
   tags:
     - always
