@@ -157,7 +157,7 @@
       notify:
         - restart sshd
       when:
-        - cis_rhel8_sshd['allowgoups'] |default('')
+        - cis_rhel8_sshd['allowgroups'] |default('')
 
     - name: 5.2.2 Ensure SSH access is limited (Scored) - denyusers
       lineinfile:
