@@ -279,7 +279,7 @@
   service:
     name: rhnsd
     state: stopped
-    enabled: true
+    enabled: false
   when:
     - cis_rhel8_1_2_2
     - "'rhnsd' in ansible_facts.packages"
