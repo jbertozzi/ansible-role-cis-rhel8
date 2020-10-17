@@ -283,7 +283,7 @@
   lineinfile:
     dest: /etc/rsyslog.conf
     regexp: '^\s*\*\.\* .*$'
-    line: '*.* {{ cis_rhel8_rsyslog_server }}'
+    line: '*.* @@{{ cis_rhel8_rsyslog_server }}'
   when:
     - cis_rhel8_4_2_1_5
     - cis_rhel8_rsyslog_server | length > 0
