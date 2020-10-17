@@ -420,22 +420,10 @@
     - level1
     - section1
 
-- name: 1.4.1 Ensure AIDE is installed (Scored) -- stat DB
-  stat:
-    path: /var/lib/aide/aide.db.new.gz
-  register: aide_db
-  changed_when: false
-  when:
-    - cis_rhel8_1_4_1
-  tags:
-    - scored
-    - level1
-    - section1
-
-- name: 1.4.1  Ensure AIDE is installed (Scored) -- init DB
-  command: /sbin/aide --init
+- name: 1.4.1  Ensure AIDE is installed (Scored)
+  shell: /sbin/aide --init && && mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
   args:
-    creates: /var/lib/aide/aide.db.new.gz
+    creates: /var/lib/aide/aide.db.gz
   when:
     - cis_rhel8_1_4_1
     - not aide_db.stat.exists
