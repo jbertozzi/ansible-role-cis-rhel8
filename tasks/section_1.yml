@@ -480,7 +480,7 @@
   shell: >
     set -o pipefail ;
     echo -e "{{ cis_rhel8_grub_password }}\n{{ cis_rhel8_grub_password }}\n" |
-    grub2-mkpasswd-pbkdf2 | sed -e '/PBKDF2 hash/!d' -e 's/PBKDF2 hash of your password//'
+    grub2-mkpasswd-pbkdf2 | sed -e '/PBKDF2 hash/!d' -e 's/PBKDF2 hash of your password is//'
   register: grub2_passwd
   changed_when: false
   when:
