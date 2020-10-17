@@ -53,6 +53,7 @@
     name: xorg-x11*
     state: absent
   when: cis_rhel8_2_2_2
+  failed_when: false
   tags:
     - scored
     - level1
