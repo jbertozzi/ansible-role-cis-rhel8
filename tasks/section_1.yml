@@ -426,7 +426,6 @@
     creates: /var/lib/aide/aide.db.gz
   when:
     - cis_rhel8_1_4_1
-    - not aide_db.stat.exists
   tags:
     - scored
     - level1
