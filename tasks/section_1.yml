@@ -421,7 +421,7 @@
     - section1
 
 - name: 1.4.1  Ensure AIDE is installed (Scored)
-  shell: /sbin/aide --init && && mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+  shell: /sbin/aide --init && mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
   args:
     creates: /var/lib/aide/aide.db.gz
   when:
